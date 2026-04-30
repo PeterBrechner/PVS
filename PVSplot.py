@@ -21,8 +21,7 @@ def npm(ndarray1, ndarray2):
 class PlotPVS():
     def __init__(self,D,dirr,M,err,x,name,chisq=4,norm=False):
         """
-        Plot PVS objects for three quantitative regimes (e.g., colder, moderate, warmer)
-        in two categorical regimes (e.g., ice phase, mixed phase).
+        Plot PVS objects.
         
         Parameters
         ----------
