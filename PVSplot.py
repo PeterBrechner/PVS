@@ -40,7 +40,6 @@ class PlotPVS():
         self.c = mpl.cm.get_cmap('viridis')
         pylab.rcParams['font.size'] = 14
     
-    
     def NofD(self,logN0,mu,la):
         """
         Calculate size distribution N(D) for gamma fit parameters N0, mu, lambda.

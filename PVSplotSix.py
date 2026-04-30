@@ -61,7 +61,6 @@ class PlotPVS():
         self.c = mpl.cm.get_cmap('viridis')
         pylab.rcParams['font.size'] = 14
     
-    
     def BC(self,res=21):
         """
         Create a table of the Bhattacharyya coefficients for each pair of PVSs.
