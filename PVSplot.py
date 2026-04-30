@@ -19,7 +19,7 @@ def npm(ndarray1, ndarray2):
 
 
 class PlotPVS():
-    def __init__(self,D,dirr,M,err,x,name,chisq=4,norm=False):
+    def __init__(self,D,dirr,M,err,x,name,chisq=4,norm=False,res=241):
         """
         Plot PVS objects.
         
@@ -41,6 +41,8 @@ class PlotPVS():
             chi squared. The default is 4.
         norm: Boolean, optional
             Normalized PVSs if True, real PVSs if False. The default is False.
+        res: odd int, optional
+            Number of distinct values of mu used for plotting. The default is 241.
         """
         self.D = D
         self.dirr = dirr
@@ -50,7 +52,8 @@ class PlotPVS():
         self.name = name
         self.chisq = chisq
         self.norm = norm
-        self.PVSx = PVS.PVS(self.M,self.err,self.x,self.chisq,self.norm)
+        self.res = res
+        self.PVSx = PVS.PVS(self.M,self.err,self.x,self.chisq,self.norm,self.res)
         self.c = mpl.cm.get_cmap('viridis')
         pylab.rcParams['font.size'] = 14
     

@@ -21,7 +21,7 @@ def npm(ndarray1, ndarray2):
 
 
 class PlotPVS():
-    def __init__(self,dirr,M,err,x,leg1x,leg2x,leg3x,leg4x,leg5x,leg6x,lgdx,name,chisq=4,norm=False):
+    def __init__(self,dirr,M,err,x,leg1x,leg2x,leg3x,leg4x,leg5x,leg6x,lgdx,name,chisq=4,norm=False,res=241):
         """
         Plot PVS objects for three quantitative regimes (e.g., colder, moderate, warmer)
         in two categorical regimes (e.g., ice phase, mixed phase).
@@ -56,6 +56,8 @@ class PlotPVS():
             chi squared. The default is 4.
         norm: Boolean, optional
             Normalized PVSs if True, real PVSs if False. The default is False.
+        res: odd int, optional
+            Number of distinct values of mu used for plotting. The default is 241.
         """
         self.dirr = dirr
         self.M = M
@@ -71,6 +73,7 @@ class PlotPVS():
         self.name = name
         self.chisq = chisq
         self.norm = norm
+        self.res = res
         self.M1 = self.M[self.leg1x,:]
         self.M2 = self.M[self.leg2x,:]
         self.M3 = self.M[self.leg3x,:]
@@ -83,12 +86,12 @@ class PlotPVS():
         self.err4 = self.err[self.leg4x,:]
         self.err5 = self.err[self.leg5x,:]
         self.err6 = self.err[self.leg6x,:]
-        self.PVS1 = PVS.PVS(self.M1,self.err1,self.x,self.chisq,self.norm)
-        self.PVS2 = PVS.PVS(self.M2,self.err2,self.x,self.chisq,self.norm)
-        self.PVS3 = PVS.PVS(self.M3,self.err3,self.x,self.chisq,self.norm)
-        self.PVS4 = PVS.PVS(self.M4,self.err4,self.x,self.chisq,self.norm)
-        self.PVS5 = PVS.PVS(self.M5,self.err5,self.x,self.chisq,self.norm)
-        self.PVS6 = PVS.PVS(self.M6,self.err6,self.x,self.chisq,self.norm)
+        self.PVS1 = PVS.PVS(self.M1,self.err1,self.x,self.chisq,self.norm,self.res)
+        self.PVS2 = PVS.PVS(self.M2,self.err2,self.x,self.chisq,self.norm,self.res)
+        self.PVS3 = PVS.PVS(self.M3,self.err3,self.x,self.chisq,self.norm,self.res)
+        self.PVS4 = PVS.PVS(self.M4,self.err4,self.x,self.chisq,self.norm,self.res)
+        self.PVS5 = PVS.PVS(self.M5,self.err5,self.x,self.chisq,self.norm,self.res)
+        self.PVS6 = PVS.PVS(self.M6,self.err6,self.x,self.chisq,self.norm,self.res)
         self.c = mpl.cm.get_cmap('viridis')
         pylab.rcParams['font.size'] = 14
     
