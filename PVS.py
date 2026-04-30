@@ -29,7 +29,7 @@ def npp(ndarray1, ndarray2):
 
 
 class PVS():
-    def __init__(self,M,err,x,chisq=4,norm=False,res=241):
+    def __init__(self,M,err,x=3,chisq=4,norm=False,res=241):
         """
         Create a PVS object.
         
@@ -40,9 +40,9 @@ class PVS():
         err: 2d array
             err from PVSgamma output MAT file.
         x: float
-            x from PVSgamma output MAT file.
+            x from PVSgamma output MAT file. The default is 3.
         chisq: float, optional
-            chi squared. The default is 4.
+            chi squared for PVS surface. The default is 4.
         norm: Boolean, optional
             Normalized PVSs if True, real PVSs if False. The default is False.
         res: odd int, optional

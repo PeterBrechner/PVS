@@ -5,7 +5,6 @@ Created on Tue Mar 24 15:23:31 2026
 @author: peter
 """
 
-import PVS
 import numpy as np
 import matplotlib as mpl
 import pylab
@@ -21,79 +20,44 @@ def npm(ndarray1, ndarray2):
 
 
 class PlotPVS():
-    def __init__(self,dirr,M,err,x,leg1x,leg2x,leg3x,leg4x,leg5x,leg6x,lgdx,name,chisq=4,norm=False,res=241):
+    def __init__(self,PVS1,PVS2,PVS3,PVS4,PVS5,PVS6,dirr,lgdx,name):
         """
         Plot PVS objects for three quantitative regimes (e.g., colder, moderate, warmer)
         in two categorical regimes (e.g., ice phase, mixed phase).
         
         Parameters
         ----------
+        PVS1: PVS.PVS() object
+            PVS for first quantitative regime and first categorical regime.
+        PVS2: PVS.PVS() object
+            PVS for second quantitative regime and first categorical regime.
+        PVS3: PVS.PVS() object
+            PVS for third quantitative regime and first categorical regime.
+        PVS4: PVS.PVS() object
+            PVS for first quantitative regime and second categorical regime.
+        PVS5: PVS.PVS() object
+            PVS for second quantitative regime and second categorical regime.
+        PVS6: PVS.PVS() object
+            PVS for third quantitative regime and second categorical regime.
         dirr: str
             Plot directory.
-        M: 2d array
-            M from PVSgamma output MAT file.
-        err: 2d array
-            err from PVSgamma output MAT file.
-        x: float
-            x from PVSgamma output MAT file.
-        leg1x: array
-            Indices for first quantitative regime and first categorical regime.
-        leg2x: array
-            Indices for second quantitative regime and first categorical regime.
-        leg3x: array
-            Indices for third quantitative regime and first categorical regime.
-        leg4x: array
-            Indices for first quantitative regime and second categorical regime.
-        leg5x: array
-            Indices for second quantitative regime and second categorical regime.
-        leg6x: array
-            Indices for third quantitative regime and second categorical regime.
         lgdx: list
             Legend for quantitative regimes.
         name: str
             Name for plots.
-        chisq: float, optional
-            chi squared. The default is 4.
-        norm: Boolean, optional
-            Normalized PVSs if True, real PVSs if False. The default is False.
-        res: odd int, optional
-            Number of distinct values of mu used for plotting. The default is 241.
         """
+        self.PVS1 = PVS1
+        self.PVS2 = PVS2
+        self.PVS3 = PVS3
+        self.PVS4 = PVS4
+        self.PVS5 = PVS5
+        self.PVS6 = PVS6
         self.dirr = dirr
-        self.M = M
-        self.err = err
-        self.x = x
-        self.leg1x = leg1x
-        self.leg2x = leg2x
-        self.leg3x = leg3x
-        self.leg4x = leg4x
-        self.leg5x = leg5x
-        self.leg6x = leg6x
         self.lgdx = lgdx
         self.name = name
-        self.chisq = chisq
-        self.norm = norm
-        self.res = res
-        self.M1 = self.M[self.leg1x,:]
-        self.M2 = self.M[self.leg2x,:]
-        self.M3 = self.M[self.leg3x,:]
-        self.M4 = self.M[self.leg4x,:]
-        self.M5 = self.M[self.leg5x,:]
-        self.M6 = self.M[self.leg6x,:]
-        self.err1 = self.err[self.leg1x,:]
-        self.err2 = self.err[self.leg2x,:]
-        self.err3 = self.err[self.leg3x,:]
-        self.err4 = self.err[self.leg4x,:]
-        self.err5 = self.err[self.leg5x,:]
-        self.err6 = self.err[self.leg6x,:]
-        self.PVS1 = PVS.PVS(self.M1,self.err1,self.x,self.chisq,self.norm,self.res)
-        self.PVS2 = PVS.PVS(self.M2,self.err2,self.x,self.chisq,self.norm,self.res)
-        self.PVS3 = PVS.PVS(self.M3,self.err3,self.x,self.chisq,self.norm,self.res)
-        self.PVS4 = PVS.PVS(self.M4,self.err4,self.x,self.chisq,self.norm,self.res)
-        self.PVS5 = PVS.PVS(self.M5,self.err5,self.x,self.chisq,self.norm,self.res)
-        self.PVS6 = PVS.PVS(self.M6,self.err6,self.x,self.chisq,self.norm,self.res)
         self.c = mpl.cm.get_cmap('viridis')
         pylab.rcParams['font.size'] = 14
+    
     
     def BC(self,res=21):
         """
@@ -130,7 +94,7 @@ class PlotPVS():
             Bhattacharyya coefficient
         """
         
-        if self.norm:
+        if (PVS1.norm & PVS2.norm):
             #Use closed form expression for pairs of normalized PVSs. 
             yp = PVS2.ym-PVS1.ym
             zp = PVS2.zm-PVS1.zm

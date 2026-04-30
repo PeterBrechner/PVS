@@ -5,7 +5,6 @@ Created on Tue Mar 24 15:23:31 2026
 @author: peter
 """
 
-import PVS
 import numpy as np
 import matplotlib as mpl
 import pylab
@@ -19,41 +18,25 @@ def npm(ndarray1, ndarray2):
 
 
 class PlotPVS():
-    def __init__(self,D,dirr,M,err,x,name,chisq=4,norm=False,res=241):
+    def __init__(self,PVSx,D,dirr,name):
         """
         Plot PVS objects.
         
         Parameters
         ----------
+        PVSx: PVS.PVS() object
+            PVS to plot
         D: array, in mm
             1e3 times self.D[idx] from PVSgamma input.
         dirr: str
             Plot directory.
-        M: 2d array
-            M from PVSgamma output MAT file.
-        err: 2d array
-            err from PVSgamma output MAT file.
-        x: float
-            x from PVSgamma output MAT file.
         name: str
             Name for plots.
-        chisq: float, optional
-            chi squared. The default is 4.
-        norm: Boolean, optional
-            Normalized PVSs if True, real PVSs if False. The default is False.
-        res: odd int, optional
-            Number of distinct values of mu used for plotting. The default is 241.
         """
+        self.PVSx = PVSx
         self.D = D
         self.dirr = dirr
-        self.M = M
-        self.err = err
-        self.x = x
         self.name = name
-        self.chisq = chisq
-        self.norm = norm
-        self.res = res
-        self.PVSx = PVS.PVS(self.M,self.err,self.x,self.chisq,self.norm,self.res)
         self.c = mpl.cm.get_cmap('viridis')
         pylab.rcParams['font.size'] = 14
     
@@ -249,7 +232,7 @@ class PlotPVS():
         Y = var[4]
         Z = var[5]
         pylab.scatter(y,z,25,color=[1,1,1],zorder=2.5)
-        pylab.scatter(Y,Z,self.chisq,c=X)
+        pylab.scatter(Y,Z,self.PVSx.chisq,c=X)
         pylab.colorbar()
         pylab.xlim(left=-1)
         pylab.ylim(bottom=0)
@@ -280,7 +263,7 @@ class PlotPVS():
         pylab.scatter(y,z,25,color=[1,1,1],zorder=2.5)
         pylab.vlines(y,z2a,z2b,color=self.c(0.9))
         pylab.plot(y2,np.sqrt(npm(z2l,z2u)),color=[0,0,0])
-        pylab.scatter(Y,Z,self.chisq,c=X)
+        pylab.scatter(Y,Z,self.PVSx.chisq,c=X)
         pylab.colorbar()
         pylab.xlim(left=-1)
         pylab.ylim(bottom=0)

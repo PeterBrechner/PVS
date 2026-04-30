@@ -38,7 +38,7 @@ def calc_sqE_one_OAP(dD,sd,count):
 
 
 class fitting():
-    def __init__(self,D,dD,sd,sqE,idx,x,iters):
+    def __init__(self,D,dD,sd,sqE,idx,x=3,iters=2):
         """
         Compute gamma fit parameters for PVSs.
         
@@ -55,9 +55,9 @@ class fitting():
         idx: array
             Indices of times to fit. Will fit sd[idx,:] with squared bin error sqE[idx,:].
         x: float
-            Exponent x used in m=a*D**x.
+            Exponent x used in m=a*D**x. The default is 3.
         iters: int
-            Number of iterations for log_inc in IGF.
+            Number of iterations for log_inc in IGF. The default is 2.
         """
         self.D = D
         self.dD = dD
