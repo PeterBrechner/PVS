@@ -20,7 +20,7 @@ def npm(ndarray1, ndarray2):
 
 
 class PlotPVS():
-    def __init__(self,PVS1,PVS2,PVS3,PVS4,PVS5,PVS6,dirr,lgdx,name):
+    def __init__(self,PVS1,PVS2,PVS3,PVS4,PVS5,PVS6,dirr,lgdx,catx,name):
         """
         Plot PVS objects for three quantitative regimes (e.g., colder, moderate, warmer)
         in two categorical regimes (e.g., ice phase, mixed phase).
@@ -43,6 +43,8 @@ class PlotPVS():
             Plot directory.
         lgdx: list
             Legend for quantitative regimes.
+        catx: list
+            Legend for categorical regimes.
         name: str
             Name for plots.
         """
@@ -54,6 +56,7 @@ class PlotPVS():
         self.PVS6 = PVS6
         self.dirr = dirr
         self.lgdx = lgdx
+        self.catx = catx
         self.name = name
         self.c = mpl.cm.get_cmap('viridis')
         pylab.rcParams['font.size'] = 14
@@ -72,13 +75,16 @@ class PlotPVS():
         for i in range(6):
             for j in range(6):
                 BC[i,j] = self.CalcBC(PVSa[i],PVSa[j],res)
-        data = {"PVS1":[np.round(BC[0,0],3),np.round(BC[0,1],3),np.round(BC[0,2],3),np.round(BC[0,3],3),np.round(BC[0,4],3),np.round(BC[0,5],3)],
-                "PVS2":[np.round(BC[1,0],3),np.round(BC[1,1],3),np.round(BC[1,2],3),np.round(BC[1,3],3),np.round(BC[1,4],3),np.round(BC[1,5],3)],
-                "PVS3":[np.round(BC[2,0],3),np.round(BC[2,1],3),np.round(BC[2,2],3),np.round(BC[2,3],3),np.round(BC[2,4],3),np.round(BC[2,5],3)],
-                "PVS4":[np.round(BC[3,0],3),np.round(BC[3,1],3),np.round(BC[3,2],3),np.round(BC[3,3],3),np.round(BC[3,4],3),np.round(BC[3,5],3)],
-                "PVS5":[np.round(BC[4,0],3),np.round(BC[4,1],3),np.round(BC[4,2],3),np.round(BC[4,3],3),np.round(BC[4,4],3),np.round(BC[4,5],3)],
-                "PVS6":[np.round(BC[5,0],3),np.round(BC[5,1],3),np.round(BC[5,2],3),np.round(BC[5,3],3),np.round(BC[5,4],3),np.round(BC[5,5],3)]}
-        df = pd.DataFrame(data,index=["PVS1","PVS2","PVS3","PVS4","PVS5","PVS6"])
+        lg = self.lgdx
+        ct = self.catx
+        lgd = [lg[0]+", "+ct[0],lg[1]+", "+ct[0],lg[2]+", "+ct[0],lg[0]+", "+ct[1],lg[1]+", "+ct[1],lg[2]+", "+ct[1]]
+        data = {lgd[0]:[np.round(BC[0,0],3),np.round(BC[0,1],3),np.round(BC[0,2],3),np.round(BC[0,3],3),np.round(BC[0,4],3),np.round(BC[0,5],3)],
+                lgd[1]:[np.round(BC[1,0],3),np.round(BC[1,1],3),np.round(BC[1,2],3),np.round(BC[1,3],3),np.round(BC[1,4],3),np.round(BC[1,5],3)],
+                lgd[2]:[np.round(BC[2,0],3),np.round(BC[2,1],3),np.round(BC[2,2],3),np.round(BC[2,3],3),np.round(BC[2,4],3),np.round(BC[2,5],3)],
+                lgd[3]:[np.round(BC[3,0],3),np.round(BC[3,1],3),np.round(BC[3,2],3),np.round(BC[3,3],3),np.round(BC[3,4],3),np.round(BC[3,5],3)],
+                lgd[4]:[np.round(BC[4,0],3),np.round(BC[4,1],3),np.round(BC[4,2],3),np.round(BC[4,3],3),np.round(BC[4,4],3),np.round(BC[4,5],3)],
+                lgd[5]:[np.round(BC[5,0],3),np.round(BC[5,1],3),np.round(BC[5,2],3),np.round(BC[5,3],3),np.round(BC[5,4],3),np.round(BC[5,5],3)]}
+        df = pd.DataFrame(data,index=lgd)
         df.to_excel(self.dirr+'Bhattacharyya'+self.name+'.xlsx')
     
     def CalcBC(self,PVS1,PVS2,res=21):
@@ -131,14 +137,10 @@ class PlotPVS():
             #Multiply the sum of the probability densities by the grid spacing.
             return np.sum(prob)*(x[1]-x[0])*(y[1]-y[0])*(z[1]-z[0])
 
-    def VertexParams(self,cat1,cat2):
+    def VertexParams(self):
         """
         Creates table of gamma fit parameters for the vertices and most likely solution of a PVS.
         Outputs linear regression coefficients to JSON file.
-        
-        Args:
-            cat1: Name of first categorical regime.
-            cat2: Name of second categorical regime.
         """
         [mu_m1,mu_l1,mu_u1,la_m1,la_lm1,la_um1,la_l1,la_u1,logN0_m1,logN0_lm1,
          logN0_um1,logN0_ll1,logN0_ul1,logN0_l1,logN0_u1] = self.PVS1.Vertex()
@@ -156,48 +158,48 @@ class PlotPVS():
                 "PVS Vertex (down)":[r'(log$_{10} N_0$, $\mu$, $\lambda$)',
                                      r'(log$_{10} N_0$ ,$\mu$, $\lambda$)',
                                      r'(log$_{10} N_0$, $\mu$, $\lambda$)'],
-                "Most Likely, "+cat1:[(float(np.round(logN0_m1,2)),float(np.round(mu_m1,2)),float(np.round(la_m1,2))),
-                                      (float(np.round(logN0_m2,2)),float(np.round(mu_m2,2)),float(np.round(la_m2,2))),
-                                      (float(np.round(logN0_m3,2)),float(np.round(mu_m3,2)),float(np.round(la_m3,2)))],
-                "Lighter "+cat1:[(float(np.round(logN0_l1,2)),float(np.round(mu_m1,2)),float(np.round(la_m1,2))),
-                                      (float(np.round(logN0_l2,2)),float(np.round(mu_m2,2)),float(np.round(la_m2,2))),
-                                      (float(np.round(logN0_l3,2)),float(np.round(mu_m3,2)),float(np.round(la_m3,2)))],
-                "Heavier "+cat1:[(float(np.round(logN0_u1,2)),float(np.round(mu_m1,2)),float(np.round(la_m1,2))),
-                                      (float(np.round(logN0_u2,2)),float(np.round(mu_m2,2)),float(np.round(la_m2,2))),
-                                      (float(np.round(logN0_u3,2)),float(np.round(mu_m3,2)),float(np.round(la_m3,2)))],
-                "Broader "+cat1+" PSD":[(float(np.round(logN0_lm1,2)),float(np.round(mu_l1,2)),float(np.round(la_lm1,2))),
-                                      (float(np.round(logN0_lm2,2)),float(np.round(mu_l2,2)),float(np.round(la_lm2,2))),
-                                      (float(np.round(logN0_lm3,2)),float(np.round(mu_l3,2)),float(np.round(la_lm3,2)))],
-                "Narrower "+cat1+" PSD":[(float(np.round(logN0_um1,2)),float(np.round(mu_u1,2)),float(np.round(la_um1,2))),
-                                      (float(np.round(logN0_um2,2)),float(np.round(mu_u2,2)),float(np.round(la_um2,2))),
-                                      (float(np.round(logN0_um3,2)),float(np.round(mu_u3,2)),float(np.round(la_um3,2)))],
-                "Larger "+cat1+" MMD":[(float(np.round(logN0_ll1,2)),float(np.round(mu_m1,2)),float(np.round(la_l1,2))),
-                                      (float(np.round(logN0_ll2,2)),float(np.round(mu_m2,2)),float(np.round(la_l2,2))),
-                                      (float(np.round(logN0_ll3,2)),float(np.round(mu_m3,2)),float(np.round(la_l3,2)))],
-                "Smaller "+cat1+" MMD":[(float(np.round(logN0_ul1,2)),float(np.round(mu_m1,2)),float(np.round(la_u1,2))),
-                                      (float(np.round(logN0_ul2,2)),float(np.round(mu_m2,2)),float(np.round(la_u2,2))),
-                                      (float(np.round(logN0_ul3,2)),float(np.round(mu_m3,2)),float(np.round(la_u3,2)))],
-                "Most Likely, "+cat2:[(float(np.round(logN0_m4,2)),float(np.round(mu_m4,2)),float(np.round(la_m4,2))),
-                                      (float(np.round(logN0_m5,2)),float(np.round(mu_m5,2)),float(np.round(la_m5,2))),
-                                      (float(np.round(logN0_m6,2)),float(np.round(mu_m6,2)),float(np.round(la_m6,2)))],
-                "Lighter "+cat2:[(float(np.round(logN0_l4,2)),float(np.round(mu_m4,2)),float(np.round(la_m4,2))),
-                                      (float(np.round(logN0_l5,2)),float(np.round(mu_m5,2)),float(np.round(la_m5,2))),
-                                      (float(np.round(logN0_l6,2)),float(np.round(mu_m6,2)),float(np.round(la_m6,2)))],
-                "Heavier "+cat2:[(float(np.round(logN0_u4,2)),float(np.round(mu_m4,2)),float(np.round(la_m4,2))),
-                                      (float(np.round(logN0_u5,2)),float(np.round(mu_m5,2)),float(np.round(la_m5,2))),
-                                      (float(np.round(logN0_u6,2)),float(np.round(mu_m6,2)),float(np.round(la_m6,2)))],
-                "Broader "+cat2+" PSD":[(float(np.round(logN0_lm4,2)),float(np.round(mu_l4,2)),float(np.round(la_lm4,2))),
-                                      (float(np.round(logN0_lm5,2)),float(np.round(mu_l5,2)),float(np.round(la_lm5,2))),
-                                      (float(np.round(logN0_lm6,2)),float(np.round(mu_l6,2)),float(np.round(la_lm6,2)))],
-                "Narrower "+cat2+" PSD":[(float(np.round(logN0_um4,2)),float(np.round(mu_u4,2)),float(np.round(la_um4,2))),
-                                      (float(np.round(logN0_um5,2)),float(np.round(mu_u5,2)),float(np.round(la_um5,2))),
-                                      (float(np.round(logN0_um6,2)),float(np.round(mu_u6,2)),float(np.round(la_um6,2)))],
-                "Larger "+cat2+" MMD":[(float(np.round(logN0_ll4,2)),float(np.round(mu_m4,2)),float(np.round(la_l4,2))),
-                                      (float(np.round(logN0_ll5,2)),float(np.round(mu_m5,2)),float(np.round(la_l5,2))),
-                                      (float(np.round(logN0_ll6,2)),float(np.round(mu_m6,2)),float(np.round(la_l6,2)))],
-                "Smaller "+cat2+" MMD":[(float(np.round(logN0_ul4,2)),float(np.round(mu_m4,2)),float(np.round(la_u4,2))),
-                                      (float(np.round(logN0_ul5,2)),float(np.round(mu_m5,2)),float(np.round(la_u5,2))),
-                                      (float(np.round(logN0_ul6,2)),float(np.round(mu_m6,2)),float(np.round(la_u6,2)))]}
+                "Most Likely, "+self.catx[0]:[(float(np.round(logN0_m1,2)),float(np.round(mu_m1,2)),float(np.round(la_m1,2))),
+                                              (float(np.round(logN0_m2,2)),float(np.round(mu_m2,2)),float(np.round(la_m2,2))),
+                                              (float(np.round(logN0_m3,2)),float(np.round(mu_m3,2)),float(np.round(la_m3,2)))],
+                "Lighter "+self.catx[0]:[(float(np.round(logN0_l1,2)),float(np.round(mu_m1,2)),float(np.round(la_m1,2))),
+                                         (float(np.round(logN0_l2,2)),float(np.round(mu_m2,2)),float(np.round(la_m2,2))),
+                                         (float(np.round(logN0_l3,2)),float(np.round(mu_m3,2)),float(np.round(la_m3,2)))],
+                "Heavier "+self.catx[0]:[(float(np.round(logN0_u1,2)),float(np.round(mu_m1,2)),float(np.round(la_m1,2))),
+                                         (float(np.round(logN0_u2,2)),float(np.round(mu_m2,2)),float(np.round(la_m2,2))),
+                                         (float(np.round(logN0_u3,2)),float(np.round(mu_m3,2)),float(np.round(la_m3,2)))],
+                "Broader "+self.catx[0]+" PSD":[(float(np.round(logN0_lm1,2)),float(np.round(mu_l1,2)),float(np.round(la_lm1,2))),
+                                                (float(np.round(logN0_lm2,2)),float(np.round(mu_l2,2)),float(np.round(la_lm2,2))),
+                                                (float(np.round(logN0_lm3,2)),float(np.round(mu_l3,2)),float(np.round(la_lm3,2)))],
+                "Narrower "+self.catx[0]+" PSD":[(float(np.round(logN0_um1,2)),float(np.round(mu_u1,2)),float(np.round(la_um1,2))),
+                                                 (float(np.round(logN0_um2,2)),float(np.round(mu_u2,2)),float(np.round(la_um2,2))),
+                                                 (float(np.round(logN0_um3,2)),float(np.round(mu_u3,2)),float(np.round(la_um3,2)))],
+                "Larger "+self.catx[0]+" MMD":[(float(np.round(logN0_ll1,2)),float(np.round(mu_m1,2)),float(np.round(la_l1,2))),
+                                               (float(np.round(logN0_ll2,2)),float(np.round(mu_m2,2)),float(np.round(la_l2,2))),
+                                               (float(np.round(logN0_ll3,2)),float(np.round(mu_m3,2)),float(np.round(la_l3,2)))],
+                "Smaller "+self.catx[0]+" MMD":[(float(np.round(logN0_ul1,2)),float(np.round(mu_m1,2)),float(np.round(la_u1,2))),
+                                                (float(np.round(logN0_ul2,2)),float(np.round(mu_m2,2)),float(np.round(la_u2,2))),
+                                                (float(np.round(logN0_ul3,2)),float(np.round(mu_m3,2)),float(np.round(la_u3,2)))],
+                "Most Likely, "+self.catx[1]:[(float(np.round(logN0_m4,2)),float(np.round(mu_m4,2)),float(np.round(la_m4,2))),
+                                              (float(np.round(logN0_m5,2)),float(np.round(mu_m5,2)),float(np.round(la_m5,2))),
+                                              (float(np.round(logN0_m6,2)),float(np.round(mu_m6,2)),float(np.round(la_m6,2)))],
+                "Lighter "+self.catx[1]:[(float(np.round(logN0_l4,2)),float(np.round(mu_m4,2)),float(np.round(la_m4,2))),
+                                         (float(np.round(logN0_l5,2)),float(np.round(mu_m5,2)),float(np.round(la_m5,2))),
+                                         (float(np.round(logN0_l6,2)),float(np.round(mu_m6,2)),float(np.round(la_m6,2)))],
+                "Heavier "+self.catx[1]:[(float(np.round(logN0_u4,2)),float(np.round(mu_m4,2)),float(np.round(la_m4,2))),
+                                         (float(np.round(logN0_u5,2)),float(np.round(mu_m5,2)),float(np.round(la_m5,2))),
+                                         (float(np.round(logN0_u6,2)),float(np.round(mu_m6,2)),float(np.round(la_m6,2)))],
+                "Broader "+self.catx[1]+" PSD":[(float(np.round(logN0_lm4,2)),float(np.round(mu_l4,2)),float(np.round(la_lm4,2))),
+                                                (float(np.round(logN0_lm5,2)),float(np.round(mu_l5,2)),float(np.round(la_lm5,2))),
+                                                (float(np.round(logN0_lm6,2)),float(np.round(mu_l6,2)),float(np.round(la_lm6,2)))],
+                "Narrower "+self.catx[1]+" PSD":[(float(np.round(logN0_um4,2)),float(np.round(mu_u4,2)),float(np.round(la_um4,2))),
+                                                 (float(np.round(logN0_um5,2)),float(np.round(mu_u5,2)),float(np.round(la_um5,2))),
+                                                 (float(np.round(logN0_um6,2)),float(np.round(mu_u6,2)),float(np.round(la_um6,2)))],
+                "Larger "+self.catx[1]+" MMD":[(float(np.round(logN0_ll4,2)),float(np.round(mu_m4,2)),float(np.round(la_l4,2))),
+                                               (float(np.round(logN0_ll5,2)),float(np.round(mu_m5,2)),float(np.round(la_l5,2))),
+                                               (float(np.round(logN0_ll6,2)),float(np.round(mu_m6,2)),float(np.round(la_l6,2)))],
+                "Smaller "+self.catx[1]+" MMD":[(float(np.round(logN0_ul4,2)),float(np.round(mu_m4,2)),float(np.round(la_u4,2))),
+                                                (float(np.round(logN0_ul5,2)),float(np.round(mu_m5,2)),float(np.round(la_u5,2))),
+                                                (float(np.round(logN0_ul6,2)),float(np.round(mu_m6,2)),float(np.round(la_u6,2)))]}
         df = pd.DataFrame(data)
         fig,ax = pylab.subplots(dpi=150,figsize=(6.4,4.8))
         ax.axis('off')
