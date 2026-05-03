@@ -18,6 +18,9 @@ np.set_printoptions(precision = 3)
 def npm(ndarray1, ndarray2):
     return np.multiply(ndarray1, ndarray2)
 
+def npd(ndarray1, ndarray2):
+    return np.divide(ndarray1, ndarray2)
+
 
 class PlotPVS():
     def __init__(self,PVS1,PVS2,PVS3,PVS4,PVS5,PVS6,dirr,lgdx,catx,name):
@@ -63,20 +66,28 @@ class PlotPVS():
     
     def BC(self,res=21):
         """
-        Create a table of the Bhattacharyya coefficients for each pair of PVSs.
+        Create tables of Bhattacharyya coefficients for each pair of PVSs.
         
         Args:
             res: Grid resolution for numerical integration. Default is 21.
         """
         #Note: For common coordinates, PVSs must be normalized.
         PVSa = [self.PVS1,self.PVS2,self.PVS3,self.PVS4,self.PVS5,self.PVS6]
-        BC = np.zeros((6,6))
+        BCxyz = np.zeros((6,6))
+        BCy = np.zeros((6,6))
+        BCyz = np.zeros((6,6))
         for i in range(6):
             for j in range(6):
-                BC[i,j] = self.CalcBC(PVSa[i],PVSa[j],res)
+                BCxyz[i,j] = self.CalcBCxyz(PVSa[i],PVSa[j],res)
+                BCy[i,j] = self.CalcBCy(PVSa[i],PVSa[j])
+                BCyz[i,j] = self.CalcBCyz(PVSa[i],PVSa[j],res)
+        BCx = npd(BCxyz,BCyz)
+        BCz = npd(BCyz,BCy)
         lg = self.lgdx
         ct = self.catx
         lgd = [lg[0]+", "+ct[0],lg[1]+", "+ct[0],lg[2]+", "+ct[0],lg[0]+", "+ct[1],lg[1]+", "+ct[1],lg[2]+", "+ct[1]]
+        
+        BC = BCxyz
         data = {lgd[0]:[np.round(BC[0,0],3),np.round(BC[0,1],3),np.round(BC[0,2],3),np.round(BC[0,3],3),np.round(BC[0,4],3),np.round(BC[0,5],3)],
                 lgd[1]:[np.round(BC[1,0],3),np.round(BC[1,1],3),np.round(BC[1,2],3),np.round(BC[1,3],3),np.round(BC[1,4],3),np.round(BC[1,5],3)],
                 lgd[2]:[np.round(BC[2,0],3),np.round(BC[2,1],3),np.round(BC[2,2],3),np.round(BC[2,3],3),np.round(BC[2,4],3),np.round(BC[2,5],3)],
@@ -84,11 +95,51 @@ class PlotPVS():
                 lgd[4]:[np.round(BC[4,0],3),np.round(BC[4,1],3),np.round(BC[4,2],3),np.round(BC[4,3],3),np.round(BC[4,4],3),np.round(BC[4,5],3)],
                 lgd[5]:[np.round(BC[5,0],3),np.round(BC[5,1],3),np.round(BC[5,2],3),np.round(BC[5,3],3),np.round(BC[5,4],3),np.round(BC[5,5],3)]}
         df = pd.DataFrame(data,index=lgd)
-        df.to_excel(self.dirr+'Bhattacharyya'+self.name+'.xlsx')
+        df.to_excel(self.dirr+'Bhattacharyya_3D'+self.name+'.xlsx')
+        
+        BC = BCyz
+        data = {lgd[0]:[np.round(BC[0,0],3),np.round(BC[0,1],3),np.round(BC[0,2],3),np.round(BC[0,3],3),np.round(BC[0,4],3),np.round(BC[0,5],3)],
+                lgd[1]:[np.round(BC[1,0],3),np.round(BC[1,1],3),np.round(BC[1,2],3),np.round(BC[1,3],3),np.round(BC[1,4],3),np.round(BC[1,5],3)],
+                lgd[2]:[np.round(BC[2,0],3),np.round(BC[2,1],3),np.round(BC[2,2],3),np.round(BC[2,3],3),np.round(BC[2,4],3),np.round(BC[2,5],3)],
+                lgd[3]:[np.round(BC[3,0],3),np.round(BC[3,1],3),np.round(BC[3,2],3),np.round(BC[3,3],3),np.round(BC[3,4],3),np.round(BC[3,5],3)],
+                lgd[4]:[np.round(BC[4,0],3),np.round(BC[4,1],3),np.round(BC[4,2],3),np.round(BC[4,3],3),np.round(BC[4,4],3),np.round(BC[4,5],3)],
+                lgd[5]:[np.round(BC[5,0],3),np.round(BC[5,1],3),np.round(BC[5,2],3),np.round(BC[5,3],3),np.round(BC[5,4],3),np.round(BC[5,5],3)]}
+        df = pd.DataFrame(data,index=lgd)
+        df.to_excel(self.dirr+'Bhattacharyya_2D'+self.name+'.xlsx')
+        
+        BC = BCx
+        data = {lgd[0]:[np.round(BC[0,0],3),np.round(BC[0,1],3),np.round(BC[0,2],3),np.round(BC[0,3],3),np.round(BC[0,4],3),np.round(BC[0,5],3)],
+                lgd[1]:[np.round(BC[1,0],3),np.round(BC[1,1],3),np.round(BC[1,2],3),np.round(BC[1,3],3),np.round(BC[1,4],3),np.round(BC[1,5],3)],
+                lgd[2]:[np.round(BC[2,0],3),np.round(BC[2,1],3),np.round(BC[2,2],3),np.round(BC[2,3],3),np.round(BC[2,4],3),np.round(BC[2,5],3)],
+                lgd[3]:[np.round(BC[3,0],3),np.round(BC[3,1],3),np.round(BC[3,2],3),np.round(BC[3,3],3),np.round(BC[3,4],3),np.round(BC[3,5],3)],
+                lgd[4]:[np.round(BC[4,0],3),np.round(BC[4,1],3),np.round(BC[4,2],3),np.round(BC[4,3],3),np.round(BC[4,4],3),np.round(BC[4,5],3)],
+                lgd[5]:[np.round(BC[5,0],3),np.round(BC[5,1],3),np.round(BC[5,2],3),np.round(BC[5,3],3),np.round(BC[5,4],3),np.round(BC[5,5],3)]}
+        df = pd.DataFrame(data,index=lgd)
+        df.to_excel(self.dirr+'Bhattacharyya_N0'+self.name+'.xlsx')
+        
+        BC = BCy
+        data = {lgd[0]:[np.round(BC[0,0],3),np.round(BC[0,1],3),np.round(BC[0,2],3),np.round(BC[0,3],3),np.round(BC[0,4],3),np.round(BC[0,5],3)],
+                lgd[1]:[np.round(BC[1,0],3),np.round(BC[1,1],3),np.round(BC[1,2],3),np.round(BC[1,3],3),np.round(BC[1,4],3),np.round(BC[1,5],3)],
+                lgd[2]:[np.round(BC[2,0],3),np.round(BC[2,1],3),np.round(BC[2,2],3),np.round(BC[2,3],3),np.round(BC[2,4],3),np.round(BC[2,5],3)],
+                lgd[3]:[np.round(BC[3,0],3),np.round(BC[3,1],3),np.round(BC[3,2],3),np.round(BC[3,3],3),np.round(BC[3,4],3),np.round(BC[3,5],3)],
+                lgd[4]:[np.round(BC[4,0],3),np.round(BC[4,1],3),np.round(BC[4,2],3),np.round(BC[4,3],3),np.round(BC[4,4],3),np.round(BC[4,5],3)],
+                lgd[5]:[np.round(BC[5,0],3),np.round(BC[5,1],3),np.round(BC[5,2],3),np.round(BC[5,3],3),np.round(BC[5,4],3),np.round(BC[5,5],3)]}
+        df = pd.DataFrame(data,index=lgd)
+        df.to_excel(self.dirr+'Bhattacharyya_mu'+self.name+'.xlsx')
+        
+        BC = BCz
+        data = {lgd[0]:[np.round(BC[0,0],3),np.round(BC[0,1],3),np.round(BC[0,2],3),np.round(BC[0,3],3),np.round(BC[0,4],3),np.round(BC[0,5],3)],
+                lgd[1]:[np.round(BC[1,0],3),np.round(BC[1,1],3),np.round(BC[1,2],3),np.round(BC[1,3],3),np.round(BC[1,4],3),np.round(BC[1,5],3)],
+                lgd[2]:[np.round(BC[2,0],3),np.round(BC[2,1],3),np.round(BC[2,2],3),np.round(BC[2,3],3),np.round(BC[2,4],3),np.round(BC[2,5],3)],
+                lgd[3]:[np.round(BC[3,0],3),np.round(BC[3,1],3),np.round(BC[3,2],3),np.round(BC[3,3],3),np.round(BC[3,4],3),np.round(BC[3,5],3)],
+                lgd[4]:[np.round(BC[4,0],3),np.round(BC[4,1],3),np.round(BC[4,2],3),np.round(BC[4,3],3),np.round(BC[4,4],3),np.round(BC[4,5],3)],
+                lgd[5]:[np.round(BC[5,0],3),np.round(BC[5,1],3),np.round(BC[5,2],3),np.round(BC[5,3],3),np.round(BC[5,4],3),np.round(BC[5,5],3)]}
+        df = pd.DataFrame(data,index=lgd)
+        df.to_excel(self.dirr+'Bhattacharyya_lambda'+self.name+'.xlsx')
     
-    def CalcBC(self,PVS1,PVS2,res=21):
+    def CalcBCxyz(self,PVS1,PVS2,res=21):
         """
-        Calculate the Bhattacharyya coefficient for a pair of PVSs.
+        Calculate the Bhattacharyya coefficient for (N0,mu,lambda) for a pair of PVSs.
 
         Args:
             PVS1: First PVS
@@ -135,7 +186,70 @@ class PlotPVS():
                                                             +PVS1.chi2z(y[j],z[k])**2+PVS2.chi2z(y[j],z[k])**2))
             #Multiply the sum of the probability densities by the grid spacing.
             return np.sum(prob)*(x[1]-x[0])*(y[1]-y[0])*(z[1]-z[0])
+    
+    def CalcBCy(self,PVS1,PVS2):
+        """
+        Calculate the Bhattacharyya coefficient for mu for a pair of PVSs.
 
+        Args:
+            PVS1: First PVS
+            PVS2: Second PVS
+
+        Returns:
+            Bhattacharyya coefficient for mu
+        """
+        
+        #Use closed form expression for all cases.
+        yp = PVS2.ym-PVS1.ym
+        chi2y = 0.5*yp**2/(PVS1.ys**2+PVS2.ys**2)
+        num = np.sqrt(2*PVS1.ys*PVS2.ys)
+        den = np.sqrt(PVS1.ys**2+PVS2.ys**2)
+        return (num/den)*np.exp(-0.5*chi2y)
+    
+    def CalcBCyz(self,PVS1,PVS2,res=21):
+        """
+        Calculate the Bhattacharyya coefficient for (mu,lambda) for a pair of PVSs.
+        The Bhattacharyya coefficient for N0 is CalcBCxyz() divided by this.
+        The Bhattacharyya coefficient for lambda is this divided by CalcBCy().
+
+        Args:
+            PVS1: First PVS
+            PVS2: Second PVS
+            res: Grid resolution for numerical integration. Default is 21.
+
+        Returns:
+            Bhattacharyya coefficient for (mu,lambda)
+        """
+        
+        if (PVS1.norm & PVS2.norm):
+            #Use closed form expression for pairs of normalized PVSs. 
+            yp = PVS2.ym-PVS1.ym
+            zp = PVS2.zm-PVS1.zm
+            chi2y = 0.5*yp**2/(PVS1.ys**2+PVS2.ys**2)
+            chi2z = 0.5*zp**2/(PVS1.zs**2+PVS2.zs**2)
+            num = np.sqrt((2*PVS1.ys*PVS2.ys)*(2*PVS1.zs*PVS2.zs))
+            den = np.sqrt((PVS1.ys**2+PVS2.ys**2)*(PVS1.zs**2+PVS2.zs**2))
+            return (num/den)*np.exp(-0.5*(chi2y+chi2z))
+        else:
+            #No closed form expression exists for the general case.
+            #Must sum the geometric mean of probability densities over an (x,y,z) grid to estimate the triple integral.
+            #Optimize the (x,y,z) grid to minimize numerical error and computational time.
+            ym = (PVS1.ym*PVS2.ys**2+PVS2.ym*PVS1.ys**2)/(PVS1.ys**2+PVS2.ys**2)
+            zm = (PVS1.zm*PVS2.zs**2+PVS2.zm*PVS1.zs**2)/(PVS1.zs**2+PVS2.zs**2)
+            stdz1 = np.sqrt(PVS1.zs**2+PVS1.a[0]**2*PVS1.ys**2)
+            stdz2 = np.sqrt(PVS2.zs**2+PVS2.a[0]**2*PVS2.ys**2)
+            y = np.linspace(ym-4*np.sqrt(PVS1.ys*PVS2.ys),ym+4*np.sqrt(PVS1.ys*PVS2.ys),res)
+            z = np.linspace(zm-4*np.sqrt(stdz1*stdz2),zm+4*np.sqrt(stdz1*stdz2),res)
+            #Compute the geometric mean of probability densities at each point on the (x,y,z) grid.
+            den = np.sqrt((2*np.pi*PVS1.ys*PVS2.ys)*(2*np.pi*PVS1.zs*PVS2.zs))
+            prob = np.zeros((len(y),len(z)))
+            for j in range(len(y)):
+                for k in range(len(z)):
+                    prob[j,k] = (1/den)*np.exp(-0.25*(PVS1.chi2y(y[j])**2+PVS2.chi2y(y[j])**2
+                                                      +PVS1.chi2z(y[j],z[k])**2+PVS2.chi2z(y[j],z[k])**2))
+            #Multiply the sum of the probability densities by the grid spacing.
+            return np.sum(prob)*(y[1]-y[0])*(z[1]-z[0])
+    
     def VertexParams(self):
         """
         Creates table of gamma fit parameters for the vertices and most likely solution of a PVS.
